@@ -1,8 +1,8 @@
 package httpserver.http;
 
 
-import httpserver.http.message.HttpParser;
-import httpserver.http.message.HttpRequest;
+import httpserver.core.HttpParser;
+import httpserver.core.HttpRequest;
 import httpserver.util.HttpParsingException;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import static httpserver.http.enums.HttpMethod.GET;
@@ -33,7 +34,7 @@ public class HttpParserTest {
     }
 
     @Test
-    public void parseHttpRequestTestValidGet() throws HttpParsingException {
+    public void parseHttpRequestTestValidGet() throws HttpParsingException, IOException {
         HttpRequest request = httpParser.parseHttpRequest(getInputStream(
                 "GET / HTTP/1.1\r\n" +
                         "Host: localhost:8080\r\n" +
@@ -52,7 +53,7 @@ public class HttpParserTest {
     }
 
     @Test
-    public void parseHttpRequestTestValidGetWithoutHeader() throws HttpParsingException {
+    public void parseHttpRequestTestValidGetWithoutHeader() throws HttpParsingException, IOException {
         HttpRequest request = httpParser.parseHttpRequest(getInputStream(
                 "GET / HTTP/1.1\r\n" +
                         "\r\n" +
@@ -79,7 +80,7 @@ public class HttpParserTest {
     }
 
     @Test
-    public void parseHttpRequestTestValidGetWithoutMessage() throws HttpParsingException {
+    public void parseHttpRequestTestValidGetWithoutMessage() throws HttpParsingException, IOException {
         HttpRequest request = httpParser.parseHttpRequest(getInputStream(
                 "GET / HTTP/1.1\r\n" +
                         "Host: localhost:8080\r\n" +
@@ -97,7 +98,7 @@ public class HttpParserTest {
     }
 
     @Test
-    public void parseHttpRequestTestValidGetWithoutHeaderAndMessage() throws HttpParsingException {
+    public void parseHttpRequestTestValidGetWithoutHeaderAndMessage() throws HttpParsingException, IOException {
         HttpRequest request = httpParser.parseHttpRequest(getInputStream(
                 "GET / HTTP/1.1\r\n"
         ));

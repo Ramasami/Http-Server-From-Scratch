@@ -1,5 +1,7 @@
 package httpserver.core;
 
+import httpserver.http.enums.HttpVersion;
+import httpserver.util.HttpParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,16 +9,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.function.BiConsumer;
 
 public class HttpConnectionWorkerThread extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpConnectionWorkerThread.class);
 
 
-    private Socket socket;
+    private final Socket socket;
+    private final BiConsumer<HttpRequest, HttpResponse> process;
 
-    public HttpConnectionWorkerThread(Socket socket) {
+    public HttpConnectionWorkerThread(Socket socket, BiConsumer<HttpRequest, HttpResponse> process) {
         this.socket = socket;
+        this.process = process;
     }
 
     private void printRequest(InputStream inputStream) throws IOException {
@@ -31,31 +36,22 @@ public class HttpConnectionWorkerThread extends Thread {
         OutputStream outputStream = null;
         try {
             inputStream = socket.getInputStream();
-//            printRequest(inputStream);
-
-
+            HttpResponse response;
+            HttpRequest request = null;
+            try {
+                request = HttpParser.parseHttpRequest(inputStream);
+                response = new HttpResponse(request.getHttpVersion());
+                process.accept(request, response);
+            } catch (HttpParsingException e) {
+                response = new HttpResponse(HttpVersion.HTTP_1_0, e.getErrorCode(), e.getErrorCode().MESSAGE);
+            }
             outputStream = socket.getOutputStream();
-
-            String html = "<html>\n" +
-                    "    <head>\n" +
-                    "        <body>Simple Http Server</body>\n" +
-                    "    </head>\n" +
-                    "</html>";
-
-            final String CRLF = "\n\r";
-            String response =
-                    "HTTP/1.1 200 OK" + CRLF +                                          // Status Line
-                            "Content-Length: " + html.getBytes().length + CRLF +        // Headers
-                            CRLF +                                                      // To show headers are finished
-                            html +
-                            CRLF + CRLF;
-
-            outputStream.write(response.getBytes());
+            outputStream.write(response.getResponseBytes());
             LOGGER.info("Response Sent");
 
             inputStream.close();
             outputStream.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.error("Problem with communication", e);
         } finally {
             if (inputStream != null) {

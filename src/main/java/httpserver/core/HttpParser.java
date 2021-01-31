@@ -1,4 +1,4 @@
-package httpserver.http.message;
+package httpserver.core;
 
 import httpserver.http.enums.HttpMethod;
 import httpserver.http.enums.HttpVersion;
@@ -26,21 +26,21 @@ public class HttpParser {
     private static final int CO = 0x3A;
 
 
-    public HttpRequest parseHttpRequest(InputStream inputStream) throws HttpParsingException {
+    public static HttpRequest parseHttpRequest(InputStream inputStream) throws HttpParsingException {
         InputStreamReader reader = new InputStreamReader(inputStream, US_ASCII);
 
         HttpRequest request = new HttpRequest();
         try {
             parseRequestLine(reader, request);
             parseHeaders(reader, request);
-            parseBody(reader, request);
+            request.setReader(reader);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return request;
     }
 
-    private void parseRequestLine(InputStreamReader reader, HttpRequest request) throws IOException, HttpParsingException {
+    private static void parseRequestLine(InputStreamReader reader, HttpRequest request) throws IOException, HttpParsingException {
         int _byte = 0;
         boolean methodParsed = false;
         boolean requestTargetParsed = false;
@@ -87,7 +87,7 @@ public class HttpParser {
         throw new HttpParsingException(BAD_REQUEST);
     }
 
-    private void parseHeaders(InputStreamReader reader, HttpRequest request) throws IOException, HttpParsingException {
+    private static void parseHeaders(InputStreamReader reader, HttpRequest request) throws IOException, HttpParsingException {
         int _byte = 0;
         boolean parsingHeader = false;
         boolean parsedKey = false;
@@ -137,7 +137,7 @@ public class HttpParser {
         request.setHeaders(Collections.emptyMap());
     }
 
-    public void parseBody(InputStreamReader reader, HttpRequest request) throws IOException {
+    public static void parseBody(InputStreamReader reader, HttpRequest request) throws IOException {
         int _byte;
         StringBuilder processingDataBuffer = new StringBuilder();
         while ((_byte = reader.read()) > 0) {

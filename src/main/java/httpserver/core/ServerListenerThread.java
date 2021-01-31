@@ -29,7 +29,14 @@ public class ServerListenerThread extends Thread {
                 Socket socket = serverSocket.accept();
                 LOGGER.info("Connection Accepted: " + socket.getInetAddress().getHostName() + ":" + port);
 
-                HttpConnectionWorkerThread httpConnectionWorkerThread = new HttpConnectionWorkerThread(socket);
+                HttpConnectionWorkerThread httpConnectionWorkerThread = new HttpConnectionWorkerThread(socket, (request, response) -> {
+                    String html = "<html>\n" +
+                            "    <head>\n" +
+                            "        <body>Simple Http Server</body>\n" +
+                            "    </head>\n" +
+                            "</html>";
+                    response.setMessage(html);
+                });
                 httpConnectionWorkerThread.start();
             }
             serverSocket.close();

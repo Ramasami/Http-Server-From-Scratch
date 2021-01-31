@@ -1,9 +1,11 @@
-package httpserver.http.message;
+package httpserver.core;
 
 import httpserver.http.enums.HttpMethod;
 import httpserver.http.enums.HttpVersion;
 import httpserver.util.HttpParsingException;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Map;
 
@@ -16,6 +18,7 @@ public class HttpRequest extends HttpMessage {
     private HttpVersion httpVersion;
     private Map<String, String> headers;
     private String message;
+    private InputStreamReader reader;
 
     HttpRequest() {
     }
@@ -62,12 +65,22 @@ public class HttpRequest extends HttpMessage {
         this.headers = Collections.unmodifiableMap(headers);
     }
 
-    public String getMessage() {
+    public String getMessage() throws IOException {
+        if(message == null)
+            HttpParser.parseBody(reader,this);
         return message;
     }
 
     void setMessage(String message) {
         this.message = message;
+    }
+
+    InputStreamReader getReader() {
+        return reader;
+    }
+
+    void setReader(InputStreamReader reader) {
+        this.reader = reader;
     }
 
     @Override

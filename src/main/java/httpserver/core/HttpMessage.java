@@ -1,4 +1,4 @@
-package httpserver.http.message;
+package httpserver.core;
 
 public abstract class HttpMessage {
 }

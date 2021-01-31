@@ -10,7 +10,10 @@ public enum HttpStatusCode {
     /* --- SERVER ERRORS --- */
     INTERNAL_SERVER_ERROR(500,"Internal Server Error"),
     NOT_IMPLEMENTED(501,"Not Implemented"),
-    VERSION_NOT_SUPPORTED(505,"Version Not Supported");
+    VERSION_NOT_SUPPORTED(505,"Version Not Supported"),
+
+    /* --- Success --- */
+    OK(200,"OK");
 
     public final int STATUS_CODE;
     public final String MESSAGE;
@@ -18,5 +21,13 @@ public enum HttpStatusCode {
     HttpStatusCode(int STATUS_CODE, String MESSAGE) {
         this.STATUS_CODE = STATUS_CODE;
         this.MESSAGE = MESSAGE;
+    }
+
+    public int getSTATUS_CODE() {
+        return STATUS_CODE;
+    }
+
+    public String getMESSAGE() {
+        return MESSAGE;
     }
 }
